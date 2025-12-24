@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Configure the Azure provider
 terraform {
   required_providers {
@@ -35,4 +36,43 @@ resource "azurerm_virtual_network" "vnet" {
   address_space = ["10.0.0.0/16"]
   location = "eastus"
   resource_group_name = azurerm_resource_group.rg.name
+=======
+# Configure the Azure provider
+terraform {
+  required_providers {
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = "~> 3.0.2"
+    }
+  }
+  cloud {
+    organization = "abhishektrainings30"
+    workspaces {
+      name = "learn-terraform-azure"
+    }
+  }
+  required_version = ">= 1.1.0"
+}
+
+provider "azurerm" {
+  features {}
+}
+
+resource "azurerm_resource_group" "rg" {
+  name     = var.resource_group_name
+  location = "eastus"
+
+  tags = {
+    Environment = "Terraform started"
+    Team = "DevOps"
+  }
+}
+
+# Create a virtual network
+resource "azurerm_virtual_network" "vnet" {
+  name = "myTFVnet"
+  address_space = ["10.0.0.0/16"]
+  location = "eastus"
+  resource_group_name = azurerm_resource_group.rg.name
+>>>>>>> 34f25756f2f238a8f1e68cd7e93f3667b12da50f
 }
