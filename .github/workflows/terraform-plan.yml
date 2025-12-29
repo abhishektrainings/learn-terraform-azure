@@ -11,9 +11,24 @@ jobs:
     env:
       # Use prod tfvars when the PR is targeting main, otherwise default to dev
       TF_VAR_FILE: ${{ github.event.pull_request.base.ref == 'main' ? 'env/prod.tfvars' : 'env/dev.tfvars' }}
+      TARGET_BRANCH: ${{ github.event.pull_request.base.ref }}
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Ensure env tfvars present
+        shell: bash
+        run: |
+          echo "Checking for ${TF_VAR_FILE} in the PR workspace..."
+          if [ ! -f "${TF_VAR_FILE}" ]; then
+            echo "${TF_VAR_FILE} not found in PR. Attempting to fetch from origin/${TARGET_BRANCH}"
+            git fetch origin "${TARGET_BRANCH}"
+            git checkout "origin/${TARGET_BRANCH}" -- "${TF_VAR_FILE}" || true
+          else
+            echo "Found ${TF_VAR_FILE} in workspace"
+          fi
 
       - name: Azure Login
         uses: azure/login@v2
@@ -27,5 +42,15 @@ jobs:
 
       - name: Terraform Init
         run: terraform init -input=false
+      - name: Terraform Init
+        run: terraform init -input=false
       - name: Terraform Plan
-        run: terraform plan -var-file="${{ env.TF_VAR_FILE }}"
+        shell: bash
+        run: |
+          if [ -f "${TF_VAR_FILE}" ]; then
+            echo "Running terraform plan with ${TF_VAR_FILE}"
+            terraform plan -var-file="${TF_VAR_FILE}"
+          else
+            echo "ERROR: ${TF_VAR_FILE} not found. Include env tfvars in the PR or add repo secrets for fallback variables."
+            exit 1
+          fi
