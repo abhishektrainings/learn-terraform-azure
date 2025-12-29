@@ -26,8 +26,18 @@ jobs:
             echo "${TF_VAR_FILE} not found in PR. Attempting to fetch from origin/${TARGET_BRANCH}"
             git fetch origin "${TARGET_BRANCH}"
             git checkout "origin/${TARGET_BRANCH}" -- "${TF_VAR_FILE}" || true
-          else
+          fi
+          if [ -f "${TF_VAR_FILE}" ]; then
             echo "Found ${TF_VAR_FILE} in workspace"
+          else
+            echo "${TF_VAR_FILE} still not found. Checking for env/example.tfvars..."
+            if [ -f "env/example.tfvars" ]; then
+              echo "Found env/example.tfvars - using it as fallback for ${TF_VAR_FILE}"
+              cp env/example.tfvars "${TF_VAR_FILE}"
+            else
+              echo "No fallback found. ${TF_VAR_FILE} is required for planning."
+              echo "Add ${TF_VAR_FILE} to the base branch or add an env/example.tfvars template to repo."
+            fi
           fi
 
       - name: Azure Login
@@ -40,8 +50,6 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
 
-      - name: Terraform Init
-        run: terraform init -input=false
       - name: Terraform Init
         run: terraform init -input=false
       - name: Terraform Plan
