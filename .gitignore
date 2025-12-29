@@ -3,6 +3,7 @@
 *.tfstate
 *.tfstate.backup
 *.tfvars
+!env/*.tfvars
 .idea/
 .vscode/
 ..bfg-report/
