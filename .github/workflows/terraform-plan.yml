@@ -8,6 +8,9 @@ on:
 jobs:
   plan:
     runs-on: ubuntu-latest
+    env:
+      # Use prod tfvars when the PR is targeting main, otherwise default to dev
+      TF_VAR_FILE: ${{ github.event.pull_request.base.ref == 'main' ? 'env/prod.tfvars' : 'env/dev.tfvars' }}
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -23,6 +26,6 @@ jobs:
         uses: hashicorp/setup-terraform@v3
 
       - name: Terraform Init
-        run: terraform init
+        run: terraform init -input=false
       - name: Terraform Plan
-        run: terraform plan -var-file="env/dev.tfvars"
+        run: terraform plan -var-file="${{ env.TF_VAR_FILE }}"
