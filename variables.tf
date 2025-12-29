@@ -1,5 +1,7 @@
 variable "resource_group_name" {
-  default = "myTFResourceGroup"
+  description = "Name of the Azure resource group"
+  type        = string
+  default     = "myTFResourceGroup"
 }
 
 variable "vnet_name" {
@@ -8,11 +10,11 @@ variable "vnet_name" {
 }
 
 variable "location" {
-  description = "Azure region for resources"
+  description = "Azure region for resources (e.g., 'East US', 'West Europe')"
   type        = string
 }
 
 variable "address_space" {
-  description = "Address space for the virtual network"
+  description = "Address space for the virtual network in CIDR notation (e.g., ['10.0.0.0/16'])"
   type        = list(string)
 }
