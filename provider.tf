@@ -11,8 +11,12 @@ provider "azurerm" {
   features {}
 
   # Service Principal authentication (for CI/CD pipelines)
-  # Set these environment variables: ARM_CLIENT_ID, ARM_CLIENT_SECRET, ARM_SUBSCRIPTION_ID, ARM_TENANT_ID
+  # Explicitly use environment variables:
+  # - ARM_CLIENT_ID
+  # - ARM_CLIENT_SECRET
+  # - ARM_SUBSCRIPTION_ID
+  # - ARM_TENANT_ID
   
-  # Alternatively, use Azure CLI authentication
-  # Run 'az login' to authenticate as a user
+  # skip_provider_registration is recommended to avoid permission issues
+  skip_provider_registration = false
 }
