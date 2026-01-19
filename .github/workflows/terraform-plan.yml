@@ -27,8 +27,9 @@ jobs:
 
       - name: Terraform Init
         run: terraform init -upgrade
-        working-directory: ./
+        
+      - name: Verify tfvars file
+        run: ls -la env/
         
       - name: Terraform Plan
-        run: terraform plan -var-file="env/dev.tfvars"
-        working-directory: ./
+        run: terraform plan -var-file="${{ github.workspace }}/env/dev.tfvars" -out=tfplan
