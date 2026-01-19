@@ -16,21 +16,14 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Get OIDC Token
-        id: get-token
+        id: oidc
         run: |
-          token=$(curl -s -H "Authorization: bearer ${{ secrets.GITHUB_TOKEN }}" \
-            -H "Accept: application/vnd.github.v3+json" \
-            -X POST \
-            "https://api.github.com/app/installations/${{ github.event.pull_request.head.repo.owner.id }}/access_tokens" \
-            -d "{\"permissions\": {\"id_token\": \"read\"}}" | jq -r '.token // empty')
-          
-          # Alternative: Use GitHub's OIDC token endpoint
           token=$(curl -s -X POST "${{ env.ACTIONS_ID_TOKEN_REQUEST_URL }}" \
-            -H "Accept: application/json" \
-            -H "Authorization: bearer ${{ env.ACTIONS_ID_TOKEN_REQUEST_TOKEN }}" | jq -r '.value')
-          
+            -H "Accept: application/json; api-version=2.0" \
+            -H "Authorization: bearer ${{ env.ACTIONS_ID_TOKEN_REQUEST_TOKEN }}" \
+            --data-raw '{"audience":"api://AzureADTokenExchange"}' | jq -r '.value')
           echo "::add-mask::$token"
-          echo "OIDC_TOKEN=$token" >> $GITHUB_ENV
+          echo "OIDC_TOKEN=$token" >> $GITHUB_OUTPUT
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
@@ -41,7 +34,7 @@ jobs:
           ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
           ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
           ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          ARM_OIDC_TOKEN: ${{ env.OIDC_TOKEN }}
+          ARM_OIDC_TOKEN: ${{ steps.oidc.outputs.OIDC_TOKEN }}
           ARM_USE_OIDC: true
         
       - name: Terraform Plan
@@ -50,5 +43,5 @@ jobs:
           ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
           ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
           ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          ARM_OIDC_TOKEN: ${{ env.OIDC_TOKEN }}
+          ARM_OIDC_TOKEN: ${{ steps.oidc.outputs.OIDC_TOKEN }}
           ARM_USE_OIDC: true
