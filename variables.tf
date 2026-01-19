@@ -1,27 +1,3 @@
-variable "azure_client_id" {
-  description = "Azure Client ID for OIDC authentication"
-  type        = string
-  sensitive   = true
-}
-
-variable "azure_tenant_id" {
-  description = "Azure Tenant ID for OIDC authentication"
-  type        = string
-  sensitive   = true
-}
-
-variable "azure_subscription_id" {
-  description = "Azure Subscription ID for OIDC authentication"
-  type        = string
-  sensitive   = true
-}
-
-variable "azure_oidc_token" {
-  description = "Azure OIDC Token from GitHub Actions"
-  type        = string
-  sensitive   = true
-}
-
 variable "resource_group_name" {
   description = "Name of the Azure resource group"
   type        = string

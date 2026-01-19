@@ -2,7 +2,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "~> 3.0"
+      version = "~> 3.80"
     }
   }
 }
@@ -10,14 +10,7 @@ terraform {
 provider "azurerm" {
   features {}
 
-  # Explicitly set credentials for OIDC authentication
-  client_id       = var.azure_client_id
-  tenant_id       = var.azure_tenant_id
-  subscription_id = var.azure_subscription_id
-  
-  # Use OIDC token from GitHub Actions
-  oidc_token = var.azure_oidc_token
-  use_oidc   = true
-
+  # OIDC authentication - uses environment variables set by azure/login@v2
+  # ARM_CLIENT_ID, ARM_TENANT_ID, ARM_SUBSCRIPTION_ID, ARM_OIDC_TOKEN, ARM_USE_OIDC
   skip_provider_registration = false
 }

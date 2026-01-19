@@ -15,25 +15,19 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Get OIDC Token
-        id: oidc
-        run: |
-          token=$(curl -s -X POST "${{ env.ACTIONS_ID_TOKEN_REQUEST_URL }}" \
-            -H "Accept: application/json; api-version=2.0" \
-            -H "Authorization: bearer ${{ env.ACTIONS_ID_TOKEN_REQUEST_TOKEN }}" \
-            --data-raw '{"audience":"api://AzureADTokenExchange"}' | jq -r '.value')
-          echo "::add-mask::$token"
-          echo "OIDC_TOKEN=$token" >> $GITHUB_OUTPUT
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          auth-type: SERVICE_PRINCIPAL_OIDC
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
 
       - name: Terraform Init
         run: terraform init
-        env:
-          ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-          ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-          ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
         
       - name: Terraform Plan
-        run: terraform plan -var-file="env/dev.tfvars" -var="azure_client_id=${{ secrets.AZURE_CLIENT_ID }}" -var="azure_tenant_id=${{ secrets.AZURE_TENANT_ID }}" -var="azure_subscription_id=${{ secrets.AZURE_SUBSCRIPTION_ID }}" -var="azure_oidc_token=${{ steps.oidc.outputs.OIDC_TOKEN }}"
+        run: terraform plan -var-file="env/dev.tfvars"
