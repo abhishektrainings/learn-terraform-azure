@@ -34,14 +34,6 @@ jobs:
           ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
           ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
           ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          ARM_OIDC_TOKEN: ${{ steps.oidc.outputs.OIDC_TOKEN }}
-          ARM_USE_OIDC: true
         
       - name: Terraform Plan
-        run: terraform plan -var-file="env/dev.tfvars"
-        env:
-          ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-          ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-          ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          ARM_OIDC_TOKEN: ${{ steps.oidc.outputs.OIDC_TOKEN }}
-          ARM_USE_OIDC: true
+        run: terraform plan -var-file="env/dev.tfvars" -var="azure_client_id=${{ secrets.AZURE_CLIENT_ID }}" -var="azure_tenant_id=${{ secrets.AZURE_TENANT_ID }}" -var="azure_subscription_id=${{ secrets.AZURE_SUBSCRIPTION_ID }}" -var="azure_oidc_token=${{ steps.oidc.outputs.OIDC_TOKEN }}"
