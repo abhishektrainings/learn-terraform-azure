@@ -1,3 +1,4 @@
+# comment: Terraform plan workflow for pull requests
 name: Terraform Plan
 
 on:
