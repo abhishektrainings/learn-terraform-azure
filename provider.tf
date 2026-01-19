@@ -10,7 +10,10 @@ terraform {
 provider "azurerm" {
   features {}
 
-  # OIDC authentication - uses environment variables set by azure/login@v2
-  # ARM_CLIENT_ID, ARM_TENANT_ID, ARM_SUBSCRIPTION_ID, ARM_OIDC_TOKEN, ARM_USE_OIDC
+  # Use OIDC authentication via environment variables set by azure/login@v2
+  client_id       = var.client_id
+  tenant_id       = var.tenant_id
+  subscription_id = var.subscription_id
+  
   skip_provider_registration = false
 }
