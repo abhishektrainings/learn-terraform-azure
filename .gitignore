@@ -4,6 +4,7 @@
 *.tfstate.backup
 *.tfvars
 !env/*.tfvars
+!terraform.auto.tfvars
 .idea/
 .vscode/
 ..bfg-report/
